@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kota Industri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="toast" id="toast"></div>
+  <div class="winbanner" id="winBanner" style="display:none;"></div>
+  <div class="modal-overlay" id="sizeModal" style="display:none;">
+    <div class="modal-box">
+      <h3>Pilih Ukuran Peta</h3>
+      <p>Restart akan menghapus semua bangunan dan memulai kota baru.</p>
+      <div class="modal-btns">
+        <button class="toolbtn" id="sizeSmallBtn">🗺️ Peta Kecil<br><span class="modal-sub">15 × 10 (150 petak)</span></button>
+        <button class="toolbtn" id="sizeLargeBtn">🗺️ Peta Besar<br><span class="modal-sub">41 × 18 (738 petak)</span></button>
+      </div>
+      <div class="modal-btns" style="margin-top:12px;">
+        <button class="toolbtn" id="sizeModalCancel">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="disconnectModal" style="display:none;">
+    <div class="modal-box">
+      <h3>Pilih Rute yang Diputus</h3>
+      <p id="disconnectModalDesc">Klik salah satu rute di bawah untuk memutusnya.</p>
+      <div class="modal-btns" id="disconnectModalBtns" style="flex-direction:column;"></div>
+      <div class="modal-btns" style="margin-top:12px;">
+        <button class="toolbtn" id="disconnectModalCancel">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="loadFileInput" accept=".json" style="display:none;">
+
+  <div class="topbar">
+    <div class="titlewrap">
+      <h1>Kota Industri</h1>
+      <div class="stat gold"><span class="lbl">Emas</span><span class="val" id="goldVal">0</span></div>
+      <div class="stat pop"><span class="lbl">Populasi</span><span class="val" id="popVal">0/0</span></div>
+      <div class="stat pop"><span class="lbl">🏆 Balai Kota</span><span class="val" id="carVal">0/0</span></div>
+    </div>
+    <div class="sub">Bangun Sumber Daya, sambungkan jadi Rantai Industri, produksi Mobil, kirim ke Balai Kota dan Menang!</div>
+  </div>
+
+  <div class="toolbar" id="toolbar"></div>
+
+  <div class="main">
+    <div class="gridcol">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>Detail bangunan</h3>
+        <div id="detailPanel" style="font-size:12.5px;color:var(--muted);line-height:1.6;">Pilih alat Lihat, lalu klik bangunan di peta.</div>
+      </div>
+      <div class="panel">
+        <h3>Log kejadian</h3>
+        <div class="log" id="log"></div>
+      </div>
+      <div class="panel">
+        <details open>
+          <summary>Cara bermain</summary>
+          <ul>
+            <li>Setiap petak punya jenis lahan: hutan, ladang, gunung, air, atau rumput.</li>
+            <li>Jalan bisa dibangun di semua jenis lahan (bukan cuma rumput), supaya lahan spesial yang terselip/terkepung tetap bisa dijangkau.</li>
+            <li>🔗 SEMUA aliran bahan antar bangunan (termasuk ke Pelabuhan dan Balai Kota) WAJIB dibuat manual lewat alat Hubungkan — bersebelahan jalan saja TIDAK otomatis membuat bahan mengalir.</li>
+            <li>Cara pakai alat Hubungkan: klik tombol Hubungkan, lalu klik bangunan berurutan — (1) bangunan asal (penghasil/pabrik/Kargo lain), (2) satu atau BEBERAPA 🚚 Kargo berturutan sebagai penghubung (klik terus Kargo lain untuk memperpanjang jangkauan), (3) baru terakhir klik bangunan tujuan (pabrik/Pelabuhan/Balai Kota) untuk menyelesaikan rute. Jadi total klik bisa lebih dari 3 kalau pakai beberapa Kargo.</li>
+            <li>Tiap Kargo di rantai cukup menjangkau titik SEBELUMNYA saja (bukan harus sampai ke ujung asal/tujuan) — jangkauannya 5 petak jalan × level Kargo itu (Lv1=5, Lv2=10, dst). Kalau di luar jangkauan, langkah itu gagal dan rantai harus diulang dari awal.</li>
+            <li>Karena satu rute sudah bisa memuat banyak Kargo sekaligus, jarak jangkauan totalnya jadi hampir tidak terbatas — asal tiap segmen (asal→Kargo pertama, antar-Kargo, Kargo terakhir→tujuan) sendiri-sendiri masih dalam jangkauan Kargo yang menghubungkannya.</li>
+            <li>Setiap Kargo punya kuota rute maksimal = levelnya sendiri (Lv1=1 rute, Lv2=2 rute, dst). Kalau kuotanya sudah penuh, Kargo itu tidak bisa dipakai untuk rute baru sampai di-upgrade atau salah satu rutenya dihapus (bongkar bangunan terkait).</li>
+            <li>Setelah rute terpasang, truk otomatis mengangkut bahan dari asal ke tujuan tiap putaran, sebanyak yang dibutuhkan tujuan — tidak ada batas jumlah lain selain itu.</li>
+            <li>Bangun penghasil bahan mentah (kayu, gandum, bijih) hanya di lahan yang cocok.</li>
+            <li>Bangun pabrik pengolah di lahan rumput, Pelabuhan hanya di lahan air.</li>
+            <li>Rantai produksi bisa panjang: Gandum→Tepung, Kayu→Papan, Kayu→Meja Kursi, Kapas→Kain→(Papan+Kain)→Furnitur, Bijih→Logam→Komponen, Minyak→Plastik, (Plastik+Komponen+Karet)→Elektronik, (Elektronik+Kaca)→Gadget, Kapas→Kain→Kemeja→(bareng Jaket+Baju)→Seragam, Kulit→Baju→(bareng Kemeja+Jaket)→Seragam, Karet→Ban, Minyak(dari Laut)→Bensin, (Ternak+Logam)→Susu Kaleng, Ternak→Wool, (Kain+Wool)→Jaket→(bareng Kemeja+Baju)→Seragam, Batu→Pasir→Kaca, (Kaca+Papan+Cat+Perkakas)→Kabinet, (Kaca+Plastik)→Serat, Mutiara→Perhiasan, (Ikan+Tepung)→Sandwich, (Daging+Sandwich+Susu Kaleng+Buah)→Sarapan, (Kayu+Logam)→Perkakas, (Papan+Minyak)→Cat, (Komponen+Bensin)→Mesin, (Logam+Elektronik+Furnitur+Ban+Mesin)→Mobil. Kulit dan Daging langsung dipanen dari Hutan (bukan diolah dari Ternak). Tiap tahap butuh rute Hubungkan sendiri-sendiri ke tahap sebelumnya.</li>
+            <li>Beberapa pabrik butuh lebih dari satu bahan sekaligus (misalnya Furnitur = Papan + Kain, Perakitan Mobil = Logam + Elektronik + Furnitur + Ban + Bensin) — semua bahan harus tersedia penuh dalam satu putaran (lewat rute masing-masing), atau pabrik menunggu tanpa membuang bahan yang ada.</li>
+            <li>🏆 Tujuan akhir: bangun Perakitan Mobil (mahal), lalu upgrade Balai Kota sampai level maksimalnya untuk memenangkan permainan! Level maksimal dan urutan komoditas gerbangnya berbeda tergantung ukuran peta (lihat rincian di bawah).</li>
+            <li>Balai Kota dan Rumah saling bergantung: untuk upgrade Balai Kota dari Level N ke N+1, kota harus punya minimal 1 Rumah Level N, DAN stok resource gerbang Level N itu di Balai Kota ini harus sudah penuh sesuai kapasitasnya. Jadi harus bergilir: naikkan Balai Kota sedikit → itu membuka level Rumah baru → Rumah itu naik → produksi menumpuk sampai penuh → baru Balai Kota bisa naik lagi, sampai level maksimal untuk menang.</li>
+            <li>Jalan tetap wajib untuk syarat membangun (semua bangunan kecuali Jalan butuh Jalan di sisi horizontal/vertikalnya) dan untuk mengukur jangkauan Kargo — tapi TIDAK lagi otomatis menyalurkan bahan tanpa rute Hubungkan.</li>
+            <li>Sambungan Jalan maupun jangkauan Kargo hanya dihitung horizontal/vertikal, diagonal tidak dihitung.</li>
+            <li>Tanpa rute Hubungkan, bahan yang diproduksi hanya menumpuk di tempat asalnya dan tidak akan pernah dipakai bangunan lain, seberapa pun dekat jaraknya.</li>
+            <li>Gunakan alat Lihat untuk cek produksi, kapasitas, status Beroperasi, dan daftar rute tiap bangunan.</li>
+
+            <li>Gunakan alat Upgrade untuk menaikkan level bangunan (maks. Lv3), menambah produksi dan kapasitas. Rumah dan bangunan penambah level tidak bisa di-upgrade lewat alat ini.</li>
+            <li>Bangun Rumah untuk menambah populasi (jumlahnya tergantung ukuran peta, lihat rincian di bawah). Bangunan industri (kecuali Jalan) memakai populasi = jumlah jenis bahan yang dibutuhkan × level bangunan (Lv1=dasar, Lv2=2×dasar, dst) — jadi pabrik dengan banyak bahan (misalnya Pabrik Elektronik butuh 2 bahan = 2 populasi di Lv1) lebih boros populasi, dan upgrade makin mahal populasinya.</li>
+            <li>Rumah punya beberapa level (Tenda → Gubuk → Rumah Sederhana → Rumah Agak Besar → Rumah Besar → Gedung Apartemen → Apartemen Mewah, jumlah level maksimalnya tergantung ukuran peta), naik otomatis dari lingkungan sekitarnya, bukan lewat Upgrade. Tiap naik 1 level, populasi rumah itu bertambah (lihat rincian di bawah).</li>
+            <li>Prasarana Perumahan (5 bangunan, jangkauan radius petak 8 arah), tiap syarat terpenuhi menambah +1 level Rumah (bisa menumpuk): 🌳 Taman (radius 1), 🗼 Sutet (radius 2), ⛲ Air Mancur (radius 3), 📡 Pemancar (radius 4), 🏕️ Hutan Kota (radius 5).</li>
+            <li>Prasarana Kota (11 bangunan, jangkauan lewat jaringan Jalan), tiap syarat terpenuhi juga menambah +1 level Rumah (bisa menumpuk): 🚏 Halte (5 Jalan), 🏫 Sekolah (6 Jalan), 🚨 Kantor Polisi (7 Jalan), 🏦 Bank (8 Jalan), 🏥 Rumah Sakit (9 Jalan), 🎮 Pusat Games (10 Jalan), ⛑️ Pemadam Kebakaran (11 Jalan), 🌃 Mall (12 Jalan), 🏟️ Stadion (13 Jalan), 🎢 Arena Bermain (14 Jalan), 🏖️ Resort Wisata (15 Jalan). Selain ke Rumah, Prasarana Kota nantinya juga bisa mendukung gedung lain.</li>
+            <li>Ada juga faktor penurun level (bisa menumpuk, minimal tetap Lv1) — dihitung radius petak lurus 8 arah, bukan jarak jalan: semua bangunan industri (semua penghasil bahan mentah & pabrik pengolah) -1 level dalam radius 2 petak; Pelabuhan/Pasar -1 level dalam radius 1 petak; tiap Prasarana Kota juga bikin keramaian sendiri dengan radius = (jangkauan Jalan-nya ÷ 5, dibulatkan ke bawah): Halte/Kantor Polisi/Bank/Rumah Sakit/Sekolah radius 1, Pusat Games/Pemadam Kebakaran/Mall/Stadion/Arena Bermain radius 2, Resort Wisata radius 3.</li>
+            <li>🏤 Balai Kota menyimpan hasil akhir tiap jalur produksi, diambil dari jaringan sebelum Pelabuhan sempat mengekspornya. Kapasitasnya naik lewat Upgrade (mencapai level maksimal = MENANG). Tiap level membuka satu resource baru (kapasitas = 2×level − level unlock). Urutan komoditasnya tergantung ukuran peta, lihat rincian di bawah. Kapasitas terus bertambah 2 tiap naik level meski resource-nya sudah lama terbuka.</li>
+            <li>Stok Balai Kota jadi kuota kota: Rumah baru bisa naik level kalau stok resource yang sesuai masih tersedia (urutannya lihat rincian di bawah), dijatah berdasar urutan rumah dibangun. Perhatikan resource-nya sudah bisa mulai tersimpan di Balai Kota SATU level lebih awal dari syarat Rumah itu sendiri — jadi ada waktu numpuk stok duluan.</li>
+            <li id="dynamicGoalInfo">(memuat rincian target sesuai ukuran peta...)</li>
+            <li>Semua bangunan (kecuali Jalan sendiri) hanya bisa dibangun jika ada Jalan tepat di sisi horizontal/vertikalnya.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="js/data.js"></script>
+<script src="js/terrain.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
