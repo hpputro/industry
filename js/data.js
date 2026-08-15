@@ -201,13 +201,7 @@ const HOUSE_LEVELS_BY_SIZE = {small: HOUSE_LEVELS_SMALL, large: HOUSE_LEVELS_LAR
 let HOUSE_LEVELS = HOUSE_LEVELS_BY_SIZE.small;
 
 
-const HOUSE_POP_BY_LEVEL_BY_SIZE = {
-  small: [2, 5, 7, 9, 10, 11, 12],
-  large: [2, 5, 7, 9, 11, 13, 15, 16, 17, 18, 19, 20, 21, 22]
-};
-
-let HOUSE_POP_BY_LEVEL = HOUSE_POP_BY_LEVEL_BY_SIZE.small;
-
+const HOUSE_POP_PER_LEVEL = 3;
 
 const SUPPLY_REACH_PER_LEVEL = 5;
 

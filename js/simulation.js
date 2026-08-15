@@ -6,7 +6,6 @@ function applyMapSizeConfig(sizeKey){
   CITYHALL_UNLOCK = CITYHALL_UNLOCK_BY_SIZE[key];
   MAX_HOUSE_LEVEL = MAX_HOUSE_LEVEL_BY_SIZE[key];
   HOUSE_LEVELS = HOUSE_LEVELS_BY_SIZE[key];
-  HOUSE_POP_BY_LEVEL = HOUSE_POP_BY_LEVEL_BY_SIZE[key];
   cityhallStats = {};
   for(const gate of LEVEL_GATES) cityhallStats[gate.resKey] = {stock:0, used:0, waiting:0};
   renderDynamicGoalInfo(key);
@@ -20,8 +19,8 @@ function renderDynamicGoalInfo(sizeKey){
   const cityhallOrder = Object.keys(CITYHALL_UNLOCK_BY_SIZE[sizeKey]).sort((a,b)=>CITYHALL_UNLOCK_BY_SIZE[sizeKey][a]-CITYHALL_UNLOCK_BY_SIZE[sizeKey][b]);
   const cityhallList = cityhallOrder.map((k,idx)=>`Lv${idx+1} ${RESOURCE_LABEL[k]}`).join(', ');
   const gateList = LEVEL_GATES_BY_SIZE[sizeKey].map(g=>`Lv${g.level} ${RESOURCE_LABEL[g.resKey]}`).join(', ');
-  const popList = HOUSE_POP_BY_LEVEL_BY_SIZE[sizeKey].map((p,idx)=>`Lv${idx+1}=${p}`).join(', ');
   const maxHouseLv = MAX_HOUSE_LEVEL_BY_SIZE[sizeKey];
+  const popList = Array.from({length: maxHouseLv}, (_,idx)=>`Lv${idx+1}=${BUILDINGS.house.pop + HOUSE_POP_PER_LEVEL*idx}`).join(', ');
   const mapLabel = sizeKey==='large' ? 'Peta Besar' : 'Peta Kecil';
   el.innerHTML = `<b>Target ${mapLabel}:</b> menangkan permainan dengan mengupgrade Balai Kota sampai Level ${maxCityhallLv}. Urutan komoditas gerbang Balai Kota: ${cityhallList}. Rumah maksimal Level ${maxHouseLv}, urutan syarat komoditas naik level Rumah: ${gateList}. Populasi per level Rumah: ${popList}.`;
 }
@@ -88,7 +87,7 @@ function getEffective(tile){
     eff.capacity = def.fixedCapacity || (PORT_CAPACITY * (tile.level||1));
     eff.sellMultiplier = def.sellMultiplier || 1;
   } else if(def.category==='house'){
-    eff.pop = HOUSE_POP_BY_LEVEL[(tile.level||1)-1];
+    eff.pop = def.pop + HOUSE_POP_PER_LEVEL*((tile.level||1)-1);
   }
   return eff;
 }
