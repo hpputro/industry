@@ -61,6 +61,14 @@ function showWinBanner(){
   addLog(`🏆 KOTA MENANG! Emas ${goldStr}, Populasi Maksimal ${popStr}.`, 'sale');
 }
 
+function showLoseBanner(){
+  const banner = document.getElementById('loseBanner');
+  const goldStr = gold.toLocaleString('id-ID');
+  banner.innerHTML = `Kota Bangkrut 💀<br>Anda Kalah dengan Utang ${goldStr} emas.`;
+  banner.style.display = 'block';
+  addLog(`💀 KOTA KALAH! Emas minus terlalu dalam (${goldStr}).`, 'err');
+}
+
 
 function openDisconnectModal(hubIndex, hubRoutes){
   const modal = document.getElementById('disconnectModal');

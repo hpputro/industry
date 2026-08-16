@@ -347,7 +347,7 @@ function computePopulation(){
 }
 
 
-let tiles, gold, selectedTool, tickHandle, logEntries, lastIncome, compCache, currentDetailTile, houseBuildCounter, hasWon, routes, connectChain, buildingTypeCounters;
+let tiles, gold, selectedTool, tickHandle, logEntries, lastIncome, compCache, currentDetailTile, houseBuildCounter, hasWon, hasLost, routes, connectChain, buildingTypeCounters;
 
 
 function initGame(sizeKey){
@@ -376,9 +376,11 @@ function initGame(sizeKey){
   houseBuildCounter = 0;
   buildingTypeCounters = {};
   hasWon = false;
+  hasLost = false;
   routes = [];
   connectChain = [];
   document.getElementById('winBanner').style.display = 'none';
+  document.getElementById('loseBanner').style.display = 'none';
   addLog(`Mulai membangun industri! Emas awal: 500. Peta ${ROWS*COLS} petak (${COLS}x${ROWS}).`, 'sale');
   buildToolbar();
   renderGrid();
@@ -404,6 +406,7 @@ function exportGameState(){
     houseBuildCounter: houseBuildCounter,
     buildingTypeCounters: buildingTypeCounters,
     hasWon: hasWon,
+    hasLost: hasLost,
     lastIncome: lastIncome
   };
   const json = JSON.stringify(state, null, 2);
@@ -449,12 +452,14 @@ function importGameState(state){
   houseBuildCounter = typeof state.houseBuildCounter==='number' ? state.houseBuildCounter : 0;
   buildingTypeCounters = state.buildingTypeCounters || {};
   hasWon = !!state.hasWon;
+  hasLost = !!state.hasLost;
   lastIncome = typeof state.lastIncome==='number' ? state.lastIncome : 0;
   selectedTool = null;
   connectChain = [];
   currentDetailTile = null;
   compCache = new Array(ROWS*COLS).fill(-1);
   document.getElementById('winBanner').style.display = hasWon ? 'block' : 'none';
+  document.getElementById('loseBanner').style.display = hasLost ? 'block' : 'none';
 
   addLog('📂 Kota berhasil dimuat dari file save.', 'sale');
   buildToolbar();
@@ -585,6 +590,8 @@ function computeComponents(){
 
 
 function tick(){
+  const goldAtTickStart = gold;
+
   tiles.forEach(t=>{
     if(t.building && BUILDINGS[t.building].category==='extractor'){
       const eff = getEffective(t);
@@ -708,6 +715,15 @@ function tick(){
   }
 
   lastIncome = tickIncome;
+
+  if(goldAtTickStart>0 && gold<=0){
+    addLog(`⚠️ Peringatan: emas kota sudah habis (${gold})! Atur ulang produksi atau bongkar bangunan yang boros sebelum bangkrut.`, 'err');
+  }
+  if(!hasLost && gold<-100){
+    hasLost = true;
+    showLoseBanner();
+  }
+
   renderGrid();
   updateHUD();
   if(currentDetailTile!=null) renderDetail(currentDetailTile);

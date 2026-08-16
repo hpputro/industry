@@ -8,7 +8,7 @@ const MAP_SIZES = {
 
 const BUILDINGS = {
   road:      {name:'Jalan',            icon:'▪️', cost:5,  terrain:['grass','forest','farm','mountain','water'], category:'road'},
-  house:     {name:'Rumah',            icon:'🏠', cost:20, terrain:['grass'], category:'house', pop:2},
+  house:     {name:'Rumah',            icon:'🏠', cost:20, terrain:['grass'], category:'house', pop:3},
   park:      {name:'Taman',            icon:'🌳', cost:40, terrain:['grass'], category:'amenity_radius'},
   sutet:      {name:'Sutet',   icon:'🗼', cost:200, terrain:['grass'], category:'amenity_radius'},
   fountain:  {name:'Air Mancur',       icon:'⛲', cost:900, terrain:['grass'], category:'amenity_radius'},
@@ -45,7 +45,7 @@ const BUILDINGS = {
   engine:    {name:'Bengkel Mesin',    icon:'🔧', cost:3000, terrain:['grass'], category:'processor', inputs:{component:2, gasoline:2}, output:'engine', produceRate:1, cap:8},
   car:       {name:'Perakitan Mobil',     icon:'🏎️', cost:10000, terrain:['grass'], category:'processor', inputs:{metal:2, electronics:2, furniture:1, tire:2, engine:3}, output:'car', produceRate:1, cap:4},
   port:      {name:'Pelabuhan',        icon:'🚢', cost:350, terrain:['water'], category:'port', sellMultiplier:1.2},
-  bazaar:    {name:'Pasar',            icon:'🏪', cost:60, terrain:['grass'], category:'port', fixedCapacity:5},
+  bazaar:    {name:'Pasar',            icon:'🏪', cost:60, terrain:['grass'], category:'port', fixedCapacity:10},
   cityhall: {name:'Balai Kota',           icon:'🏤', cost:150, terrain:['grass'], category:'cityhall'},
   relay:     {name:'Kargo',           icon:'🚚', cost:50, terrain:['grass'], category:'relay'},
   freshwater:{name:'Sumber Air',       icon:'💧', cost:20, terrain:['water'], category:'extractor', resource:'freshwater', rate:2, cap:28},
