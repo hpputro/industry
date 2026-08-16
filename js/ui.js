@@ -272,7 +272,7 @@ function renderBuildPreview(buildingKey){
   const def = BUILDINGS[buildingKey];
   if(!def){ panel.textContent = 'Pilih alat Lihat, lalu klik bangunan di peta.'; return; }
   if(def.category==='cityhall'){
-    panel.innerHTML = `<b style="color:var(--text)">${def.icon} ${def.name}</b><br>Menyimpan sumber daya sebagai syarat naik level Rumah, diambil dari jaringan sebelum diekspor.<br>Biaya: ${def.cost} emas`;
+    panel.innerHTML = `<b style="color:var(--text)">${def.icon} ${def.name}</b><br>Menyimpan sumber daya sebagai syarat naik level Rumah, diambil dari jaringan sebelum diekspor.<br>Biaya: ${def.cost} emas<br>Gaji pekerja: ${getBasePopulation(buildingKey)} emas/putaran (Lv1).`;
     return;
   }
   let html = `<b style="color:var(--text)">${def.icon} ${def.name}</b><br>Biaya: ${def.cost} emas`;
@@ -311,6 +311,9 @@ function renderBuildPreview(buildingKey){
     html += `<br>Menambah populasi kota.<br>Levelnya naik otomatis jika bahan pendukung dan prasarana perumahan terpenuhi; turun otomatis jika dekat bangunan industri.`;
   } else if(def.category==='road'){
     html += `<br>Menyambungkan jaringan bangunan, dan menentukan jangkauan Kargo/amenity.`;
+  }
+  if(def.category!=='road' && def.category!=='house'){
+    html += `<br>Gaji pekerja: ${getBasePopulation(buildingKey)} emas/putaran (Lv1).`;
   }
   panel.innerHTML = html;
 }
@@ -423,6 +426,9 @@ function renderDetail(i){
     html += `Aktif melayani Rumah di sekitarnya.`;
   } else if(def.category==='road'){
     html += `Menyambungkan jaringan, tidak memproduksi apa pun.`;
+  }
+  if(def.category!=='road' && def.category!=='house'){
+    html += `<br>Gaji pekerja: ${getBasePopulation(tile.building)*level} emas/putaran.`;
   }
   if(def.category!=='road' && def.category!=='house' && def.category!=='amenity_radius' && def.category!=='amenity_road'){
     if(level<maxLv){

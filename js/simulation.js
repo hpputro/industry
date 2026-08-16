@@ -666,6 +666,19 @@ function tick(){
 
   updateHouseLevels();
 
+  let tickWages = 0;
+  for(let i=0;i<tiles.length;i++){
+    const t = tiles[i];
+    if(!t.building) continue;
+    const cat = BUILDINGS[t.building].category;
+    if(cat==='road' || cat==='house') continue;
+    tickWages += getBasePopulation(t.building) * (t.level||1);
+  }
+  if(tickWages>0){
+    gold -= tickWages;
+    addLog(`Membayar gaji pekerja: ${tickWages} emas (populasi ${tickWages}).`);
+  }
+
   let tickIncome = 0;
   for(let i=0;i<tiles.length;i++){
     const t = tiles[i];
