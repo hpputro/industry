@@ -80,6 +80,8 @@ const PRICES = {wood:1, wheat:1, ore:4, cotton:1, rubber:1, oil:5, planks:4, flo
 
 const PROCESS_TIER = {sawmill:1, flourmill:1, smelter:1, furniture:2, component:2, electronics:3, fabric:1, clothing:2, tire:1, gasoline:1, car:4, plastic:1, wool:1, jacket:2, sandpit:1, glass:2, fiber:3, jewelry:1, shirtmaker:1, gadgetmaker:4, restaurant:3, woodworker:1, uniform:3, cabinet:3, tools:2, paint:2, cannedmilk:2, sandwich:2, engine:3};
 
+const SELLABLE_TYPES_BY_PRICE_DESC = Object.keys(PRICES).sort((a,b)=>PRICES[b]-PRICES[a]);
+
 const PORT_CAPACITY = 10;
 
 const MAX_LEVEL_OVERRIDE_BY_SIZE = {

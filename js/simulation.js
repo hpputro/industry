@@ -73,15 +73,19 @@ function levelMultiplier(level){
 
 function getEffective(tile){
   const def = BUILDINGS[tile.building];
-  const mult = levelMultiplier(tile.level||1);
+  const level = tile.level||1;
+  const mult = levelMultiplier(level);
   const eff = Object.assign({}, def);
   if(def.category==='extractor'){
     eff.rate = Math.round(def.rate*mult);
     eff.cap = Math.round(def.cap*mult);
   } else if(def.category==='processor'){
     eff.inputs = {};
-    for(const key in def.inputs) eff.inputs[key] = Math.round(def.inputs[key]*mult);
-    eff.produceRate = Math.round(def.produceRate*mult);
+    for(const key in def.inputs){
+      const base = def.inputs[key];
+      eff.inputs[key] = base + (level-1)*(base-1);
+    }
+    eff.produceRate = def.produceRate + (level-1);
     eff.cap = Math.round(def.cap*mult);
   } else if(def.category==='port'){
     eff.capacity = def.fixedCapacity || (PORT_CAPACITY * (tile.level||1));
@@ -331,6 +335,9 @@ function getBasePopulation(buildingKey){
   return 1;
 }
 
+function getPopulationUsed(buildingKey, level){
+  return getBasePopulation(buildingKey) + (level-1);
+}
 
 function computePopulation(){
   let cap = 0, used = 0;
@@ -340,7 +347,7 @@ function computePopulation(){
     if(def.category==='house'){
       cap += getEffective(t).pop;
     } else if(def.category!=='road'){
-      used += getBasePopulation(t.building) * (t.level||1);
+      used += getPopulationUsed(t.building, t.level||1);
     }
   });
   return {cap, used};
@@ -679,7 +686,7 @@ function tick(){
     if(!t.building) continue;
     const cat = BUILDINGS[t.building].category;
     if(cat==='road' || cat==='house') continue;
-    tickWages += getBasePopulation(t.building) * (t.level||1);
+    tickWages += getPopulationUsed(t.building, t.level||1);
   }
   if(tickWages>0){
     gold -= tickWages;
@@ -692,7 +699,7 @@ function tick(){
     if(!t.building || BUILDINGS[t.building].category!=='port') continue;
     const eff = getEffective(t);
     let capacityLeft = eff.capacity;
-    for(const resType of ['electronics','component','metal','furniture','clothing','gasoline','tire','plastic','flour','planks','fabric','oil','ore','wheat','wood','cotton','rubber','jewelry','fiber','glass','jacket','meat','wool','sand','pearl','stone','livestock','fruit','freshwater','leather','shirt','gadget','breakfast','tablechair','uniform','cabinet','tools','paint','cannedmilk','fish','sandwich','engine']){
+    for(const resType of SELLABLE_TYPES_BY_PRICE_DESC){
       if(capacityLeft<=0) break;
       const producers = findReachableProducerTiles(i, resType);
       const totalBuf = producers.reduce((a,p)=>a+p.buffer,0);

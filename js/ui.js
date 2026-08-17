@@ -436,11 +436,11 @@ function renderDetail(i){
     html += `Menyambungkan jaringan, tidak memproduksi apa pun.`;
   }
   if(def.category!=='road' && def.category!=='house'){
-    html += `<br>Gaji pekerja: ${getBasePopulation(tile.building)*level} emas/putaran.`;
+    html += `<br>Gaji pekerja: ${getPopulationUsed(tile.building, level)} emas/putaran.`;
   }
   if(def.category!=='road' && def.category!=='house' && def.category!=='amenity_radius' && def.category!=='amenity_road'){
     if(level<maxLv){
-      html += `<br>Biaya upgrade ke Lv${level+1}: ${def.cost*level} emas + ${getBasePopulation(tile.building)} populasi`;
+      html += `<br>Biaya upgrade ke Lv${level+1}: ${def.cost*level} emas + 1 populasi`;
     } else if(!(def.category==='cityhall' && level>=maxLv)){
       html += `<br>Sudah level maksimal (Lv${maxLv}).`;
     }
@@ -578,8 +578,7 @@ function onTileClick(i){
       }
     }
     const pop = computePopulation();
-    const base = getBasePopulation(tile.building);
-    if(pop.used+base > pop.cap){ addLog(`Populasi tidak cukup untuk upgrade (butuh ${base}, tersisa ${pop.cap-pop.used}). Bangun Rumah dulu.`, 'err'); return; }
+    if(pop.used+1 > pop.cap){ addLog(`Populasi tidak cukup untuk upgrade (butuh 1, tersisa ${pop.cap-pop.used}). Bangun Rumah dulu.`, 'err'); return; }
     const def = BUILDINGS[tile.building];
     const cost = def.cost*level;
     if(gold<cost){ addLog(`Emas tidak cukup untuk upgrade (butuh ${cost}).`, 'err'); return; }
