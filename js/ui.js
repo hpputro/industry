@@ -316,7 +316,7 @@ function renderBuildPreview(buildingKey){
       html += `<br>Menurunkan level Rumah -1 dalam radius ${negEffect.radius} petak (efek keramaian).`;
     }
   } else if(def.category==='house'){
-    html += `<br>Menambah populasi kota.<br>Levelnya naik otomatis jika bahan pendukung dan prasarana perumahan terpenuhi; turun otomatis jika dekat bangunan industri.`;
+    html += `<br>Menambah populasi kota.<br>Levelnya naik otomatis jika bahan pendukung dan prasarana perumahan terpenuhi; turun otomatis jika dekat bangunan industri.<br>Pajak: (Level-1) emas/putaran — makin tinggi levelnya, makin besar pajaknya.`;
   } else if(def.category==='road'){
     html += `<br>Menyambungkan jaringan bangunan, dan menentukan jangkauan Kargo/amenity.`;
   }
@@ -373,7 +373,7 @@ function renderDetail(i){
     html += `Kapasitas: ${eff.capacity} unit/putaran${priceNote}`;
   } else if(def.category==='house'){
     const desiredLv = computeDesiredHouseLevel(i);
-    html += `Menambah populasi kota: +${eff.pop}<br><br>`;
+    html += `Menambah populasi kota: +${eff.pop}<br>Pajak: ${level-1} emas/putaran.<br><br>`;
     const saranaIcons = LEVEL_GATES.filter(g=>level>=g.level).map(g=>{
       const pk = getProducerKey(g.resKey);
       return pk ? BUILDINGS[pk].icon : '';
