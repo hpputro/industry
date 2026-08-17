@@ -690,15 +690,15 @@ function tick(){
     addLog(`Membayar gaji pekerja: ${tickWages} emas (populasi ${tickWages}).`);
   }
 
-  let tickTax = 0;
+  let tickIncentive = 0;
   for(let i=0;i<tiles.length;i++){
     const t = tiles[i];
     if(!t.building || BUILDINGS[t.building].category!=='house') continue;
-    tickTax += (t.level||1) - 1;
+    tickIncentive += (t.level||1) - 1;
   }
-  if(tickTax>0){
-    gold -= tickTax;
-    addLog(`Membayar pajak rumah: ${tickTax} emas.`);
+  if(tickIncentive>0){
+    gold += tickIncentive;
+    addLog(`Menerima insentif rumah: ${tickIncentive} emas.`, 'sale');
   }
 
   let tickIncome = 0;
