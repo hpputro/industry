@@ -163,7 +163,7 @@ const TERRAIN_NAME = {forest:'Hutan', mountain:'Gunung', farm:'Ladang', water:'L
 
 const NET_COLORS = ['#e3a857','#4fb3a9','#d9695f','#8f7fd9','#5fa8d9','#c76b9c'];
 
-const MAX_LEVEL = 3;
+const MAX_LEVEL = 4;
 
 
 const MAX_HOUSE_LEVEL_BY_SIZE = {small:7, large:14};

@@ -81,11 +81,8 @@ function getEffective(tile){
     eff.cap = Math.round(def.cap*mult);
   } else if(def.category==='processor'){
     eff.inputs = {};
-    for(const key in def.inputs){
-      const base = def.inputs[key];
-      eff.inputs[key] = base + (level-1)*(base-1);
-    }
-    eff.produceRate = def.produceRate + (level-1);
+    for(const key in def.inputs) eff.inputs[key] = Math.round(def.inputs[key]*mult);
+    eff.produceRate = Math.round(def.produceRate*mult);
     eff.cap = Math.round(def.cap*mult);
   } else if(def.category==='port'){
     eff.capacity = def.fixedCapacity || (PORT_CAPACITY * (tile.level||1));
